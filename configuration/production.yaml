@@ -2,3 +2,7 @@
 
 application:
   host: 0.0.0.0
+
+  database:
+    # Require SSL for production instances
+    require_ssl: true
