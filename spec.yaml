@@ -34,6 +34,22 @@ services:
       - key: APP_DATABASE__DATABASE_NAME
         scope: RUN_TIME
         value: ${newsletter.DATABASE}
+jobs:
+  # running migrations from my local machine was failing...
+  # This should do the trick on each deployment
+  - name: migrate
+    kind: PRE_DEPLOY
+    dockerfile_path: Dockerfile
+    source_dir: .
+    github:
+      branch: main
+      repo: smythg4/zero2prod
+    run_command: sqlx migrate run 
+    envs:
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        value: ${newsletter.DATABASE_URL}
+        
 databases:
   # PG = Postgres
   - engine: PG
