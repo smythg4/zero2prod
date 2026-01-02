@@ -55,7 +55,7 @@ async fn configure_database(config: &DatabaseSettings) -> PgPool {
         ..config.clone()
     };
 
-    let mut connection = PgConnection::connect_with(&maintenance_settings.connection_options())
+    let mut connection = PgConnection::connect_with(&maintenance_settings.connect_options())
         .await
         .expect("Failed to connect to Postgres.");
 
@@ -65,7 +65,7 @@ async fn configure_database(config: &DatabaseSettings) -> PgPool {
         .expect("Failed to create database.");
     println!("Created new database: {}", config.database_name);
 
-    let connection_pool = PgPool::connect_with(config.connection_options())
+    let connection_pool = PgPool::connect_with(config.connect_options())
         .await
         .expect("Failed to connect to Postgres.");
 

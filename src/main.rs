@@ -14,7 +14,7 @@ async fn main() -> Result<(), std::io::Error> {
 
     // panic if we can't read configuration
     let configuration = get_configuration().expect("Failed to read configuration.");
-    let connection_pool = PgPool::connect_lazy_with(configuration.database.connection_options());
+    let connection_pool = PgPool::connect_lazy_with(configuration.database.connect_options());
 
     let address = format!(
         "{}:{}",
