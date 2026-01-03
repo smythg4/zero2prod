@@ -6,3 +6,7 @@ application:
 database:
   # Require SSL for production instances
   require_ssl: true
+email_client:
+  # From postmark's API docs: 
+  base_url: "https://api.postmarkapp.com/email"
+  sender_email: "something@gmail.com"
