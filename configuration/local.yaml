@@ -2,7 +2,10 @@
 
 application:
   host: 127.0.0.1
+  base_url: "http://127.0.0.1"
 
 database:
   # Don't require ssl for local instances
   require_ssl: false
+  # we are only setting the development value
+  authorization_token: "my-secret-token"

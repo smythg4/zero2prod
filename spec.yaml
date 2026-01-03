@@ -34,6 +34,13 @@ services:
       - key: APP_DATABASE__DATABASE_NAME
         scope: RUN_TIME
         value: ${newsletter.DATABASE}
+      # provisioned base url as an environment variable
+      - key: APP_APPLICATION__BASE_URL
+        scope: RUN_TIME
+        value: ${APP_URL}
+      - key: APP_EMAIL_CLIENT__AUTHORIZATION_TOKEN
+        scope: RUN_TIME
+        type: SECRET
 
 databases:
   # PG = Postgres

@@ -27,6 +27,7 @@ tracing-actix-web = "0.7"
 unicode-segmentation = "1"
 claims = "0.7"
 validator = "0.18"
+rand = { version = "0.8", features = ["std_rng"] }
 
 [dependencies.sqlx]
 version = "0.8"
@@ -50,6 +51,6 @@ features = ["json", "rustls-tls"]
 fake = "2.9"
 quickcheck = "1.0.3"
 quickcheck_macros = "1"
-rand = "0.8"
 wiremock = "0.6"
 serde_json = "1"
+linkify = "0.10"

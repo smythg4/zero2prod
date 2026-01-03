@@ -1,13 +1,14 @@
+use crate::configuration::DatabaseSettings;
+use crate::configuration::Settings;
 use crate::email_client::EmailClient;
+use crate::routes::confirm;
 use crate::routes::{health_check, subscribe};
 use actix_web::dev::Server;
 use actix_web::{App, HttpServer, web};
 use sqlx::PgPool;
+use sqlx::postgres::PgPoolOptions;
 use std::net::TcpListener;
 use tracing_actix_web::TracingLogger;
-use crate::configuration::Settings;
-use sqlx::postgres::PgPoolOptions;
-use crate::configuration::DatabaseSettings;
 
 pub struct Application {
     port: u16,
@@ -36,9 +37,14 @@ impl Application {
         );
         let listener = TcpListener::bind(address)?;
         let port = listener.local_addr().unwrap().port();
-        let server = run(listener, connection_pool, email_client)?;
+        let server = run(
+            listener,
+            connection_pool,
+            email_client,
+            configuration.application.base_url,
+        )?;
         // We "save" the bound port in one of `Applications` fields
-        Ok(Self{ port, server })
+        Ok(Self { port, server })
     }
 
     pub fn port(&self) -> u16 {
@@ -53,26 +59,30 @@ impl Application {
 }
 
 pub fn get_connection_pool(configuration: &DatabaseSettings) -> PgPool {
-    PgPoolOptions::new()
-        .connect_lazy_with(configuration.connect_options())
+    PgPoolOptions::new().connect_lazy_with(configuration.connect_options())
 }
 
-
+// Will need a wrapper to retrieve the url in the `subscribe` handler.
+pub struct ApplicationBaseUrl(pub String);
 
 pub fn run(
     listener: TcpListener,
     db_pool: PgPool,
     email_client: EmailClient,
+    base_url: String,
 ) -> Result<Server, std::io::Error> {
     let db_pool = web::Data::new(db_pool); // wraps it in an Arc
     let email_client = web::Data::new(email_client);
+    let base_url = web::Data::new(ApplicationBaseUrl(base_url));
     let server = HttpServer::new(move || {
         App::new()
             .wrap(TracingLogger::default())
             .route("/health_check", web::get().to(health_check))
             .route("/subscriptions", web::post().to(subscribe))
+            .route("/subscriptions/confirm", web::get().to(confirm))
             .app_data(db_pool.clone()) // only incrementing the ref count
             .app_data(email_client.clone()) // only incrementing the ref count (Can also `Arc::clone(email_client)`)
+            .app_data(base_url.clone())
     })
     .listen(listener)?
     .run();
