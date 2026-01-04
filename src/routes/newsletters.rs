@@ -1,13 +1,13 @@
 //! src/routes/newsletters.rs
 
-use actix_web::{ResponseError, HttpResponse};
-use actix_web::web;
-use sqlx::PgPool;
+use crate::domain::SubscriberEmail;
 use crate::email_client::EmailClient;
 use crate::routes::error_chain_fmt;
-use crate::domain::SubscriberEmail;
 use actix_web::http::StatusCode;
+use actix_web::web;
+use actix_web::{HttpResponse, ResponseError};
 use anyhow::Context;
+use sqlx::PgPool;
 
 #[derive(thiserror::Error)]
 pub enum PublishError {
@@ -42,7 +42,11 @@ pub struct Content {
 }
 
 // Dummy implementation
-pub async fn publish_newsletter(body: web::Json<BodyData>, pool: web::Data<PgPool>, email_client: web::Data<EmailClient>) -> Result<HttpResponse, PublishError> {
+pub async fn publish_newsletter(
+    body: web::Json<BodyData>,
+    pool: web::Data<PgPool>,
+    email_client: web::Data<EmailClient>,
+) -> Result<HttpResponse, PublishError> {
     let subscribers = get_confirmed_subscribers(&pool).await?;
     for subscriber in subscribers {
         // The compiler forces us to handle both the happy and unhappy case.
@@ -53,14 +57,14 @@ pub async fn publish_newsletter(body: web::Json<BodyData>, pool: web::Data<PgPoo
                         &subscriber.email,
                         &body.title,
                         &body.content.html,
-                        &body.content.text
+                        &body.content.text,
                     )
                     .await
                     // with_context is the 'lazy' version of context. It will only allocate the string in the error case
                     .with_context(|| {
                         format!("Failed to send newsletter issue to {}", subscriber.email)
                     })?;
-            },
+            }
             Err(error) => {
                 tracing::warn!(
                     // We record the error chain as a structured field
@@ -73,7 +77,6 @@ pub async fn publish_newsletter(body: web::Json<BodyData>, pool: web::Data<PgPoo
                 );
             }
         }
-
     }
     Ok(HttpResponse::Ok().finish())
 }
@@ -91,11 +94,10 @@ impl std::fmt::Display for SubscriberEmail {
 
 #[tracing::instrument(name = "Get confirmed subscribers", skip(pool))]
 async fn get_confirmed_subscribers(
-    pool: &PgPool
-    // We are returning a `Vec` of `Result` in the happy case.
-    // This allows the caller to bubble up errors due to network issues or other
-    // transient failures using the `?` operator, while the compiler
-    // forces them to handle the subtler mapping error (invalid email addresses)
+    pool: &PgPool, // We are returning a `Vec` of `Result` in the happy case.
+                   // This allows the caller to bubble up errors due to network issues or other
+                   // transient failures using the `?` operator, while the compiler
+                   // forces them to handle the subtler mapping error (invalid email addresses)
 ) -> Result<Vec<Result<ConfirmedSubscriber, anyhow::Error>>, anyhow::Error> {
     let rows = sqlx::query!(
         r#"
