@@ -3,7 +3,8 @@
 application:
   host: 127.0.0.1
   base_url: "http://127.0.0.1"
-
+email_client:
+  authorization_token: "test-token"
 database:
   # Don't require ssl for local instances
   require_ssl: false

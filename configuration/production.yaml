@@ -9,4 +9,4 @@ database:
 email_client:
   # From postmark's API docs: 
   base_url: "https://api.postmarkapp.com/email"
-  sender_email: "something@gmail.com"
+  sender_email: "stephen.w.smith2.mil@us.navy.mil"

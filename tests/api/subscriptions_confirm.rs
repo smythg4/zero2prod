@@ -59,7 +59,7 @@ async fn clicking_on_the_confirmation_link_confirms_a_subscriber() {
     let response = reqwest::get(confirmation_links.html).await;
 
     dbg!(&response);
-    let response = response.unwrap().error_for_status().unwrap();
+    let _response = response.unwrap().error_for_status().unwrap();
 
     // Assert
     let saved = sqlx::query!("SELECT email, name, status FROM subscriptions",)
