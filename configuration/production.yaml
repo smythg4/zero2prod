@@ -8,5 +8,5 @@ database:
   require_ssl: true
 email_client:
   # From postmark's API docs: 
-  base_url: "https://api.postmarkapp.com/email"
+  base_url: "https://api.postmarkapp.com"
   sender_email: "stephen.w.smith2.mil@us.navy.mil"
