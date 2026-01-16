@@ -250,6 +250,8 @@ pub async fn spawn_app() -> TestApp {
     let application_port = application.port();
     // get the port before spawning the app.
     let address = format!("http://127.0.0.1:{}", application_port);
+    
+    #[allow(clippy::let_underscore_future)]
     let _ = tokio::spawn(application.run_until_stopped());
 
     let client = reqwest::Client::builder()
