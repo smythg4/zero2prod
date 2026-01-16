@@ -2,6 +2,7 @@
 
 application:
   port: 8000
+  hmac_secret: "long-and-very-secret-random-key-needed-to-verify-message-integrity"
 database: 
   host: "localhost"
   port: 5432
@@ -13,3 +14,5 @@ email_client:
   sender_email: "test@gmail.com"
   timeout_milliseconds: 10000 # 10 second timeout
   authorization_token: "placeholder" # this will be overwritten by DO secret
+# 6379 is Redis default port
+redis_uri: "redis://127.0.0.1:6379"

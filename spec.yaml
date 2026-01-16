@@ -38,10 +38,18 @@ services:
       - key: APP_APPLICATION__BASE_URL
         scope: RUN_TIME
         value: ${APP_URL}
-      # this should work now...
+      # can't get postmark to work for real (won't permit public email domains)
+      # this key will respond with a 200 if the data received is valid, but
+      # won't actually send an email
       - key: APP_EMAIL_CLIENT__AUTHORIZATION_TOKEN
         scope: RUN_TIME
-        type: SECRET
+        value: POSTMARK_API_TEST
+      - key: APP_APPLICATION__HMAC_SECRET
+        scope: RUN_TIME
+        value: long-and-very-secret-random-key-needed-to-verify-message-integrity
+      - key: APP_REDIS_URI
+        score: RUN_TIME
+        type: secret
 
 databases:
   # PG = Postgres

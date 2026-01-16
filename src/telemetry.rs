@@ -1,11 +1,21 @@
 //! src/telemetry.rs
 
+use tokio::task::JoinHandle;
 use tracing::Subscriber;
 use tracing::subscriber::set_global_default;
 use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
 use tracing_log::LogTracer;
 use tracing_subscriber::fmt::MakeWriter;
 use tracing_subscriber::{EnvFilter, Registry, layer::SubscriberExt};
+
+pub fn spawn_blocking_with_tracing<F, R>(f: F) -> JoinHandle<R>
+where
+    F: FnOnce() -> R + Send + 'static,
+    R: Send + 'static,
+{
+    let current_span = tracing::Span::current();
+    tokio::task::spawn_blocking(move || current_span.in_scope(f))
+}
 
 /// Compose multiple layers into a `tracing`s subscriber
 pub fn get_subscriber<Sink>(
